@@ -94,7 +94,7 @@ extern "C" {
 	typedef struct
 	{
 		//close flag
-		boolean* craps_num_close_requested;
+		boolean* yahtzee_num_close_requested;
 
 		//4 score array
 		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2];

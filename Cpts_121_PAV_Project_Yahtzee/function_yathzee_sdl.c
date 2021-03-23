@@ -162,10 +162,9 @@ void fnc_sdl_init_parameter(YAHTZEE_Parameter_Thread* yahtzee_parameter)
 	fnc_init_player_environment(yahtzee_parameter->array_dice, yahtzee_parameter->array_dice_index, yahtzee_parameter->array_player_score_temp, yahtzee_parameter->array_player_score_official);
 
 	yahtzee_parameter->mouse_flag = 0;
-	yahtzee_parameter->craps_num_close_requested = false;
+	yahtzee_parameter->yahtzee_num_close_requested = false;
 	yahtzee_parameter->yahtzee_phase = YAHTZEE_INIT;
-	
-	
+	yahtzee_parameter->mouse_flag = YAHTZEE_MOUSE_INIT;
 }
 
 int fnc_sdl_init()
@@ -232,15 +231,15 @@ SDL_Texture* fnc_sdl_create_pic_texture(SDL_Renderer* yahtzee_main_window_render
 
 int fnc_sdl_render_main(void* yahtzee_shared_data)
 {
+	YAHTZEE_Parameter_Thread* parameter_thread_data = yahtzee_shared_data;
+	
+	//close flag
+	boolean* yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
+
 	const Uint32 yahtzee_sdl_render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-	boolean yahtzee_num_close_requested = false;
 	const char* location_pic = "sss";
 	
-	fnc_sdl_init();
-
-
-
-	
+	fnc_sdl_init();	
 
 	//init main window
 	SDL_Window* yahtzee_main_window = fnc_sdl_create_window();
