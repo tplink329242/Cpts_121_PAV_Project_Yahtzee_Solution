@@ -157,6 +157,17 @@ void fnc_update_main_menu_selected(int* val_i_player_selected, YAHTZEE_PhaseType
 	*val_i_player_selected = GAME_YAHTZEE_VALUE_MOUSE_PLAYER_SELECT_START_GAME;
 }
 
+void fnc_sdl_init_parameter(YAHTZEE_Parameter_Thread* yahtzee_parameter)
+{
+	fnc_init_player_environment(yahtzee_parameter->array_dice, yahtzee_parameter->array_dice_index, yahtzee_parameter->array_player_score_temp, yahtzee_parameter->array_player_score_official);
+
+	yahtzee_parameter->mouse_flag = 0;
+	yahtzee_parameter->craps_num_close_requested = false;
+	yahtzee_parameter->yahtzee_phase = YAHTZEE_INIT;
+	
+	
+}
+
 int fnc_sdl_init()
 {
 	int res = 0;
@@ -227,6 +238,10 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	
 	fnc_sdl_init();
 
+
+
+	
+
 	//init main window
 	SDL_Window* yahtzee_main_window = fnc_sdl_create_window();
 	SDL_Renderer* yahtzee_main_window_renderer = fnc_sdl_create_render(yahtzee_main_window, yahtzee_sdl_render_flags);
@@ -249,4 +264,5 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 		// wait 1/60th of a second
 		SDL_Delay(1000 / 30);
 	}
+	return 0;
 }

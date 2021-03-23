@@ -26,20 +26,18 @@ int main(int argc, char* argv[])
 	//seeds
 	srand((unsigned)time(NULL));
 
-	//define key arrays
-	int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2];
-	int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE];
-	int array_player_score_temp[14];
-	int array_player_score_official[14][2];
-	
-	fnc_init_player_environment(array_dice, array_dice_index, array_player_score_temp, array_player_score_official);
-
-
+	//define core elements
+	YAHTZEE_Parameter_Thread yahtzee_parameter;
+	fnc_sdl_init_parameter(&yahtzee_parameter);
+		
 	//init render thread num
 	int num_thread_return_number = 0;
 
 
-	SDL_Thread* thread_render = SDL_CreateThread(fnc_sdl_render_main, "Yahtzee Render Thread", NULL);
+
+
+	
+	SDL_Thread* thread_render = SDL_CreateThread(fnc_sdl_render_main, "Yahtzee Render Thread", &yahtzee_parameter);
 
 	
 	

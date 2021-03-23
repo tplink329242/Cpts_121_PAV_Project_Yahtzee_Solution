@@ -93,12 +93,27 @@ extern "C" {
 
 	typedef struct
 	{
-		boolean craps_num_close_requested;
-		SDL_Renderer* yahtzee_main_window_renderer;
-		SDL_Texture* yahtzee_tex_background;
-		
-	}YAHTZEE_ParameterRender;
+		//close flag
+		boolean* craps_num_close_requested;
 
+		//4 score array
+		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2];
+		int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE];
+		int array_player_score_temp[14];
+		int array_player_score_official[14][2];
+
+		//game object struct
+		YAHTZEE_PhaseType yahtzee_phase;
+		YAHTZEE_MouseClickFlag mouse_flag;
+		YAHTZEE_GameObjectList yahtzee_game_object_list;
+		YAHTZEE_GameObjectList yahtzee_game_mouse_click_list;
+		YAHTZEE_GameObjectList yahtzee_game_dice_list;
+		
+	}YAHTZEE_Parameter_Thread;
+
+
+
+	
 		
 	//sdl event receiver
 	SDL_Event fnc_sdl_event_receiver();
@@ -133,6 +148,9 @@ extern "C" {
 	//switch the main menu start select flag
 	void fnc_update_main_menu_selected(int* val_i_player_selected,
 		YAHTZEE_PhaseType* game_phase);
+
+	//init sdl parameter
+	void fnc_sdl_init_parameter(YAHTZEE_Parameter_Thread* yahtzee_parameter);
 
 	//init sdl environment
 	int fnc_sdl_init();
