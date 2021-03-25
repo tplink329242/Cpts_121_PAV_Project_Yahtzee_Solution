@@ -59,7 +59,8 @@ extern "C" {
 		YAHTZEE_MOUSE_SCORE_CHANCE,
 		YAHTZEE_MOUSE_SCORE_FULL_HOUSE,
 		YAHTZEE_MOUSE_SCORE_YAHTZEE,
-		YAHTZEE_MOUSE_GAVE_OVER
+		YAHTZEE_MOUSE_CONTINUE_ROLLING,
+		YAHTZEE_MOUSE_GAVE_OVER,
 
 	}YAHTZEE_MouseClickFlag;
 
@@ -89,7 +90,7 @@ extern "C" {
 		YAHTZEE_GameObject* object_game;
 		struct YAHTZEE_GameObjectList* next;
 		
-	}YAHTZEE_GameObjectList;
+	}YAHTZEE_GameObjectList;                 
 
 	typedef struct
 	{
@@ -104,10 +105,18 @@ extern "C" {
 
 		//game object struct
 		YAHTZEE_PhaseType yahtzee_phase;
+
+
+		//struct do not use
 		YAHTZEE_MouseClickFlag mouse_flag;
 		YAHTZEE_GameObjectList yahtzee_game_object_list;
 		YAHTZEE_GameObjectList yahtzee_game_mouse_click_list;
 		YAHTZEE_GameObjectList yahtzee_game_dice_list;
+
+		YAHTZEE_GameObject yahtzee_array_game_object_list[GAME_YAHTZEE_VALUE_MAX_GAME_OBJECT_ELEMENTS];
+		YAHTZEE_GameObject yahtzee_array_game_render_list[GAME_YAHTZEE_VALUE_MAX_GAME_OBJECT_ELEMENTS];
+		YAHTZEE_GameObject yahtzee_array_game_dice_list[GAME_YAHTZEE_VALUE_MAX_DICE_NUM];
+		
 		
 	}YAHTZEE_Parameter_Thread;
 

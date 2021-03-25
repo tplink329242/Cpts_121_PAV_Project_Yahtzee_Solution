@@ -33,13 +33,15 @@ int main(int argc, char* argv[])
 	//init render thread num
 	int num_thread_return_number = 0;
 
-
-
-
 	
 	SDL_Thread* thread_render = SDL_CreateThread(fnc_sdl_render_main, "Yahtzee Render Thread", &yahtzee_parameter);
 
-	
+	while (!yahtzee_parameter.yahtzee_num_close_requested)
+	{
+		// wait 1/60th of a second
+		SDL_Delay(1000 / 30);
+	}
+	return 0;
 	
 	
 	return 0;

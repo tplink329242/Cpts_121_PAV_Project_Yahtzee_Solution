@@ -120,6 +120,8 @@ void fnc_sdl_click_event_switcher(YAHTZEE_MouseClickFlag mouse_flag,
 	case YAHTZEE_MOUSE_GAVE_OVER:
 		*val_i_player_selected = GAME_YAHTZEE_VALUE_MOUSE_PLAYER_SELECT_START_GAME;
 		break;
+
+		
 	default:;
 	}
 }
@@ -237,7 +239,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	boolean* yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
 
 	const Uint32 yahtzee_sdl_render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
-	const char* location_pic = "sss";
+	const char* location_pic = "res/pic/mainmenu.jpg";
 	
 	fnc_sdl_init();	
 
