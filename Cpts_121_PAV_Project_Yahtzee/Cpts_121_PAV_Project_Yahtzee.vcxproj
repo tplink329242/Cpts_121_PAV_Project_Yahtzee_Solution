@@ -140,11 +140,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="function_yahtzee.c" />
+    <ClCompile Include="function_yahtzee_event.c" />
+    <ClCompile Include="function_yahtzee_render.c" />
     <ClCompile Include="function_yathzee_sdl.c" />
     <ClCompile Include="main.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="function_yahtzee.h" />
+    <ClInclude Include="function_yahtzee_event.h" />
+    <ClInclude Include="function_yahtzee_render.h" />
     <ClInclude Include="function_yathzee_sdl.h" />
     <ClInclude Include="include\begin_code.h" />
     <ClInclude Include="include\close_code.h" />

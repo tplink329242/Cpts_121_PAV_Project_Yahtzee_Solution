@@ -11,7 +11,7 @@ namespace PAVUnitTest
 		
 		TEST_METHOD(Test_calc_score_1_6)
 		{
-			int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE];
+			int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE] = { 0 };
 			
 			for (int i = 0; i < GAME_YAHTZEE_VALUE_MAX_DICE_FACE; ++i)
 			{

@@ -1,0 +1,109 @@
+
+
+#include "PAIV_Funcions.h"
+
+
+int main(int argc, char* argv[])
+{
+	if (sdl_init() != 0 || sdl_ttf_init() != 0)
+	{
+		return 1;
+	}
+
+	/*Global SDL settings*/
+	const Uint32 sdl_current_render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
+	SDL_Color textColor = { 255, 255, 255 };
+	SDL_Surface* message = NULL;
+	
+
+
+	//load text
+	TTF_Font* font = NULL;
+	font = TTF_OpenFont("res/data/calibri.ttf", 75);
+	message = TTF_RenderUTF8_Solid(font, "Hello!", textColor);
+	
+	SDL_Window* win = sdl_create_window();
+	SDL_Renderer* render = sdl_create_render(win, sdl_current_render_flags);
+	SDL_Surface* surface = sdl_create_surface("res/pic/surface_test.PNG");
+	SDL_Surface* surface_background = sdl_create_surface("res/pic/magnet.PNG");
+	SDL_Texture* tex = sdl_create_texture_from_surface(render, surface);
+	SDL_Texture* tex_background = sdl_create_texture_from_surface(render, surface_background);
+
+	SDL_Texture* fonts = sdl_create_texture_from_surface(render, message);
+	
+	SDL_Rect dest;
+	SDL_Rect dest_fonts;
+	SDL_Event event;
+
+	SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
+	SDL_QueryTexture(fonts, NULL, NULL, &dest_fonts.w, &dest_fonts.h);
+
+	
+	// require float resolution for y position
+	float y_pos = WINDOW_HEIGHT;
+	float x_pos = 0;
+
+	// origin is the top left corner, positive y is down
+	//dest.x = (WINDOW_WIDTH - dest.w) / 2;
+	dest.x = 0;
+	dest.y = (int)y_pos;
+
+
+	dest_fonts.x = 400;
+	dest_fonts.y = 300;
+
+	int close_requested = 0;
+	
+	// animation loop
+	while (!close_requested)
+	{
+		while (SDL_PollEvent(&event))
+		{
+			if (event.type == SDL_QUIT)
+			{
+				close_requested = 1;
+			}
+		}
+		// clear the window
+		SDL_RenderClear(render);
+
+		// set the y position in the struct
+		dest.y = (int)y_pos;
+		dest.x = (int)x_pos;
+
+		// draw the image to the window
+		SDL_RenderCopy(render, tex_background, NULL, NULL);
+		SDL_RenderCopy(render, tex, NULL, &dest);
+		SDL_RenderCopy(render, fonts, NULL, &dest_fonts);
+		SDL_RenderPresent(render);
+
+		// update sprite position
+		y_pos -= (float)SCROLL_SPEED / 60;
+		x_pos += (float)SCROLL_SPEED / 60;
+
+		// wait 1/60th of a second
+		SDL_Delay(1000 / 60);
+
+		if (y_pos <= 0)
+		{
+			y_pos = WINDOW_HEIGHT;
+		}
+		if (x_pos >= WINDOW_WIDTH)
+		{
+			x_pos = 0;
+		}
+	}
+
+	
+	/*SDL_RenderClear(render);
+	SDL_RenderCopy(render, tex, NULL, NULL);
+	SDL_RenderPresent(render);
+
+	SDL_Delay(10000);*/
+
+	SDL_DestroyTexture(tex);
+	SDL_DestroyRenderer(render);
+	SDL_DestroyWindow(win);	
+	SDL_Quit();
+	return 0;
+}

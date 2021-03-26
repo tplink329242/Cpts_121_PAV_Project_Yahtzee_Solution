@@ -84,9 +84,6 @@ extern "C" {
 #pragma comment(lib ,"lib/x64/SDL2_image.lib")
 
 
-
-
-
 	
 
 /*************************************************************
@@ -425,7 +422,7 @@ extern "C" {
 	 * Preconditions:                                            *
 	 * Postconditions:                                           *
 	 *************************************************************/
-	int fnc_exec_game_one_round(int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2], int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE], int array_player_score_temp[14], int array_player_score_official[14][2]);
+	int fnc_exec_game_one_round(int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2], int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE], int array_player_score_temp[14]);
 
 	/*************************************************************
 	 * Function: fnc_exec_main_game(void)                         *
@@ -482,6 +479,10 @@ extern "C" {
 	 * Postconditions:                                           *
 	 *************************************************************/
 	void fnc_init_player_environment(int(*array_dice)[2], int* array_dice_index, int* array_player_score_temp, int(*array_player_score_official)[2]);
+
+	//pickup pictures
+	const char* sdl_pick_up_dice(int numbers);
+
 
 
 	

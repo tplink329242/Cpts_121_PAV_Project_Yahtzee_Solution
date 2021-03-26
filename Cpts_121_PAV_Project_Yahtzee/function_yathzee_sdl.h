@@ -72,6 +72,20 @@ extern "C" {
 		YAHTZEE_GAME_OBJECT_TYPE_PICTURE
 		
 	}YAHTZEE_GameObjectType;
+
+	typedef enum
+	{
+		YAHTZEE_GAME_OBJECT_NAME_INIT,
+		YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_TITLE,
+		YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_PLAY,
+		YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_RULES,
+		YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_RULES_PRINTED,
+		
+
+	}YAHTZEE_GameObjectName;
+
+
+	
 	
 	typedef struct
 	{
@@ -95,7 +109,8 @@ extern "C" {
 	typedef struct
 	{
 		//close flag
-		boolean* yahtzee_num_close_requested;
+		boolean yahtzee_num_close_requested;
+		boolean yahtzee_is_consumer_go;
 
 		//4 score array
 		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2];
@@ -120,43 +135,7 @@ extern "C" {
 		
 	}YAHTZEE_Parameter_Thread;
 
-
-
 	
-		
-	//sdl event receiver
-	SDL_Event fnc_sdl_event_receiver();
-
-	//sdl event handler
-	int fnc_sdl_event_handler(SDL_Event yahtzee_event, YAHTZEE_GameObjectList mouse_click_list);
-
-	//get mouse signal
-	YAHTZEE_MouseClickFlag fnc_sdl_mouse_event_handler(YAHTZEE_GameObjectList* mouse_click_list);
-
-	//switch the select flag
-	int fnc_sdl_event_switcher(int sdl_event_flag, 
-		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2], 
-		int* val_i_player_selected,
-		YAHTZEE_PhaseType* game_phase);
-	
-	//switch the mouse select flag
-	void fnc_sdl_click_event_switcher(YAHTZEE_MouseClickFlag mouse_flag,
-		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2],
-		int* val_i_player_selected,
-		YAHTZEE_PhaseType* game_phase);
-
-	//switch the mouse select flag
-	void fnc_update_dice_selected(YAHTZEE_MouseClickFlag mouse_flag,
-		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2],
-		int* val_i_player_selected);
-
-	//switch the rules select flag
-	void fnc_update_rules_selected(int* val_i_player_selected,
-		YAHTZEE_PhaseType* game_phase);
-
-	//switch the main menu start select flag
-	void fnc_update_main_menu_selected(int* val_i_player_selected,
-		YAHTZEE_PhaseType* game_phase);
 
 	//init sdl parameter
 	void fnc_sdl_init_parameter(YAHTZEE_Parameter_Thread* yahtzee_parameter);
@@ -164,17 +143,7 @@ extern "C" {
 	//init sdl environment
 	int fnc_sdl_init();
 
-	//init sdl window
-	SDL_Window* fnc_sdl_create_window();
-
-	//create render
-	SDL_Renderer* fnc_sdl_create_render(SDL_Window* win, Uint32 sdl_current_render_flags);
-
-	//create texture from picture
-	SDL_Texture* fnc_sdl_create_pic_texture(SDL_Renderer* yahtzee_main_window_renderer, const char* location_pic);
-
-	//main render thread
-	int fnc_sdl_render_main(void* yahtzee_shared_data);
+	
 
 
 #ifdef __cplusplus

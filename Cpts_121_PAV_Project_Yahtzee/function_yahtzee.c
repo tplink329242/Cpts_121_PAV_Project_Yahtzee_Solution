@@ -331,8 +331,7 @@ void fnc_calc_sum_score(int array_dice_score_official[14][2])
 
 int fnc_exec_game_one_round(int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2],
 	int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE],
-	int array_player_score_temp[14],
-	int array_player_score_official[14][2])
+	int array_player_score_temp[14])
 {	
 	//start rolling
 	fnc_update_dices(array_dice);
@@ -366,7 +365,7 @@ int fnc_exec_round_game(int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2],
 	//game start
 	while (val_i_die_trying > 0  && *val_i_player_selected == 0)
 	{
-		fnc_exec_game_one_round(array_dice, array_dice_index, array_player_score_temp, array_player_score_official);
+		fnc_exec_game_one_round(array_dice, array_dice_index, array_player_score_temp);
 		
 		//check if score has been freeze and force to select
 		//get score select
@@ -458,3 +457,26 @@ void fnc_init_player_environment(int(*array_dice)[2], int* array_dice_index, int
 	fnc_init_2d_array(array_dice, GAME_YAHTZEE_VALUE_MAX_DICE_NUM);
 	fnc_init_2d_array(array_player_score_official, 14);
 }
+
+const char* sdl_pick_up_dice(int numbers)
+{
+	switch (numbers)
+	{
+	case 1:
+		return "res/pic/dice_1.PNG";
+	case 2:
+		return "res/pic/dice_2.PNG";
+	case 3:
+		return "res/pic/dice_3.PNG";
+	case 4:
+		return "res/pic/dice_4.PNG";
+	case 5:
+		return "res/pic/dice_5.PNG";
+	case 6:
+		return "res/pic/dice_6.PNG";
+	}
+	return NULL;
+}
+
+
+

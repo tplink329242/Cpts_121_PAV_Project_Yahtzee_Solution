@@ -17,8 +17,9 @@
 *******************************************************************************************/
 
 #include "function_yahtzee.h"
+#include "function_yahtzee_render.h"
 #include "function_yathzee_sdl.h"
-
+#include "function_yahtzee_event.h"
 
 
 int main(int argc, char* argv[])
@@ -30,19 +31,55 @@ int main(int argc, char* argv[])
 	YAHTZEE_Parameter_Thread yahtzee_parameter;
 	fnc_sdl_init_parameter(&yahtzee_parameter);
 		
-	//init render thread num
-	int num_thread_return_number = 0;
+	//lock
+	SDL_mutex* bufferLock = NULL;
+	bufferLock = SDL_CreateMutex();
 
+	//signal
+	SDL_cond* canProduce = NULL;
+	SDL_cond* canConsume = NULL;
+	canProduce = SDL_CreateCond();
+	canConsume = SDL_CreateCond();
 	
+
+	//create sdl thread
 	SDL_Thread* thread_render = SDL_CreateThread(fnc_sdl_render_main, "Yahtzee Render Thread", &yahtzee_parameter);
 
-	while (!yahtzee_parameter.yahtzee_num_close_requested)
+	YAHTZEE_PhaseType yahtzee_phase = YAHTZEE_INIT;
+
+
+
+	
+	SDL_mutexP(bufferLock);
+	boolean is_closed = yahtzee_parameter.yahtzee_num_close_requested;
+	yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
+	yahtzee_parameter.yahtzee_phase = yahtzee_phase;
+	yahtzee_parameter.yahtzee_is_consumer_go = false;
+	SDL_mutexV(bufferLock);
+
+	
+	while (!is_closed)
 	{
-		// wait 1/60th of a second
-		SDL_Delay(1000 / 30);
+		SDL_mutexP(bufferLock);
+		is_closed = yahtzee_parameter.yahtzee_num_close_requested;
+		yahtzee_phase = yahtzee_parameter.yahtzee_phase;
+		SDL_mutexV(bufferLock);
+
+		if (yahtzee_phase == YAHTZEE_IN_GAME)
+		{
+			SDL_mutexP(bufferLock);
+			fnc_exec_game_one_round(yahtzee_parameter.array_dice, yahtzee_parameter.array_dice_index, yahtzee_parameter.array_player_score_temp);			
+			yahtzee_parameter.yahtzee_is_consumer_go = true;
+			SDL_mutexV(bufferLock);
+			SDL_CondSignal(canConsume);
+		
+
+			
+		}
+
+
+		
+		//SDL_Delay(1000 / 60);
 	}
-	return 0;
-	
-	
 	return 0;
 }

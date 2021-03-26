@@ -1,0 +1,13 @@
+num_list,description,message
+1,game_open,Welcome to the craps! Press s to start
+2,game_select_balance,Please select your balance.
+3,game_select_wager,Please select your wager.
+4,game_start_rolling,The game is about to begin! Have a good luck!
+5,game_start_rolling,The game is about to begin! Have a good luck!
+6,game_first_rolling_win,You Win This Round!
+7,game_first_rolling_lose,You Lose This Round!
+8,game_first_rolling_continue,To win you must continue rolling the dice until you "make your point".
+9,game_rolling_continue,Aw cmon take a chance!
+10,game_balance_zero,Sorry you busted!
+11,game_balance_near_zero,Oh you're going for broke huh?
+12,game_balance_double, You're up big now's the time to cash in your chips!

@@ -24,6 +24,12 @@
     <ClCompile Include="function_yathzee_sdl.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="function_yahtzee_render.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="function_yahtzee_event.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="function_yahtzee.h">
@@ -294,6 +300,12 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="function_yathzee_sdl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="function_yahtzee_render.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="function_yahtzee_event.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
