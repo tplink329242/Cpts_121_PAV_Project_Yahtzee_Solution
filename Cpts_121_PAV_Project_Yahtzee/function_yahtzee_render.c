@@ -193,12 +193,13 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{
-				yahtzee_event.type = SDL_FIRSTEVENT;
+				
 				if (yahtzee_event.button.button == SDL_BUTTON_LEFT)
 				{
 				    
 					if (fnc_check_mouse_click_event_checker(rect_Play_button))
 					{
+						yahtzee_event.type = SDL_FIRSTEVENT;
 						//enter a new session
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
@@ -207,6 +208,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 					}
 					if (fnc_check_mouse_click_event_checker(rect_Rule_button))
 					{
+						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU_RULES;
@@ -224,11 +226,12 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{
-				yahtzee_event.type = SDL_FIRSTEVENT;
+				
 				if (yahtzee_event.button.button == SDL_BUTTON_LEFT)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_Play_button))
 					{
+						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
@@ -236,6 +239,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 					}
 					if (fnc_check_mouse_click_event_checker(rect_Rule_button))
 					{
+						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
@@ -344,13 +348,13 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			
 			
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
-			{
-				yahtzee_event.type = SDL_FIRSTEVENT;
+			{			
 				//check dice
 				for (int i = 0; i < 5; ++i)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_dice_array[i]))
 					{
+						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						if (parameter_thread_data->array_dice[i][1] == true)
@@ -367,6 +371,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_roll_again))
 					{
+						yahtzee_event.type = SDL_FIRSTEVENT;
 						parameter_thread_data->yahtzee_is_consumer_go = false;
 						parameter_thread_data->yahtzee_is_producer_go = true;
 						parameter_thread_data->array_dice[5][0]--;
