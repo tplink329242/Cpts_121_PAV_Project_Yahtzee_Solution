@@ -21,6 +21,9 @@ void fnc_sdl_init_parameter(YAHTZEE_Parameter_Thread* yahtzee_parameter)
 	yahtzee_parameter->thd_canConsume = SDL_CreateCond();
 	yahtzee_parameter->thd_canProduce = SDL_CreateCond();
 
+	yahtzee_parameter->num_game_score_selected = 0;
+	//yahtzee_parameter->array_player_score_official[0][1] = 1;
+
 }
 
 int fnc_sdl_init()

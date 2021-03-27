@@ -95,6 +95,7 @@ extern "C" {
 		YAHTZEE_GAME_OBJECT_NAME_SCORE_FULL_HOUSE,
 		YAHTZEE_GAME_OBJECT_NAME_SCORE_YAHTZEE,
 		YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE,
+		YAHTZEE_GAME_OBJECT_NAME_SCORE_FINAL_SCORE,
 
 	}YAHTZEE_GameObjectName;
 
@@ -139,7 +140,7 @@ extern "C" {
 		int array_player_score_temp[14];
 		int array_player_score_official[14][2];
 
-
+		int num_game_score_selected;
 
 		//game object struct
 		YAHTZEE_PhaseType yahtzee_phase;

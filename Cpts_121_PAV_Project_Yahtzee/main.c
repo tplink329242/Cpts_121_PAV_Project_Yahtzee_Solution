@@ -58,6 +58,12 @@ int main(int argc, char* argv[])
 		yahtzee_phase = yahtzee_parameter.yahtzee_phase;
 		SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
 
+		if (yahtzee_phase == YAHTZEE_GAME_MAIN_MENU)
+		{
+			fnc_init_player_environment(yahtzee_parameter.array_dice, yahtzee_parameter.array_dice_index, yahtzee_parameter.array_player_score_temp, yahtzee_parameter.array_player_score_official);
+			SDL_Delay(500);
+		}		
+
 		if (yahtzee_phase == YAHTZEE_IN_GAME)
 		{
 			SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
@@ -67,26 +73,37 @@ int main(int argc, char* argv[])
 
 			SDL_CondBroadcast(yahtzee_parameter.thd_canConsume);
 
-			printf_s("The roll time has %d times.\n", yahtzee_parameter.array_dice[5][0]);
+			printf_s("The roll time has %d times. ", yahtzee_parameter.array_dice[5][0]);
+
+			printf_s("The game score selected num is : %d \n", yahtzee_parameter.num_game_score_selected);
+
+			if (yahtzee_parameter.num_game_score_selected >= 13)
+			{
+				yahtzee_parameter.yahtzee_phase = YAHTZEE_GAVE_OVER;
+			}
 
 			SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
 
-			SDL_Delay(500);
-
-			
-			SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
-			while (!yahtzee_parameter.yahtzee_is_producer_go)
-			{				
-				SDL_CondWait(yahtzee_parameter.thd_canProduce, yahtzee_parameter.thd_bufferLock);
-			}			
-			SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
-			
-			
+			SDL_Delay(100);
 		}
 
+		if (yahtzee_phase == YAHTZEE_GAVE_OVER)
+		{
+			SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
+			fnc_init_player_environment(yahtzee_parameter.array_dice, yahtzee_parameter.array_dice_index, yahtzee_parameter.array_player_score_temp, yahtzee_parameter.array_player_score_official);
+			SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
+			SDL_Delay(500);
+		}
 
+		SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
+		while (!yahtzee_parameter.yahtzee_is_producer_go)
+		{
+			SDL_CondWait(yahtzee_parameter.thd_canProduce, yahtzee_parameter.thd_bufferLock);
+		}
+		SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
 		
-		//SDL_Delay(1000 / 60);
+		
+		SDL_Delay(1000 / 60);
 	}
 	return 0;
 }

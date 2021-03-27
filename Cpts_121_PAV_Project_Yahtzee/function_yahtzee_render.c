@@ -70,6 +70,9 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	//mouse
 	int mouse_state_x = 0, mouse_state_y = 0;
 
+	//player selected number;
+	int num_player_selected = 0;
+
 	
 	SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 	//close flag
@@ -146,8 +149,14 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	
 	SDL_Rect rect_score_name;
 	SDL_Rect rect_score_num;
+	SDL_Rect rect_score_num_array[14];
 
 	SDL_Rect rect_roll_again;
+
+
+	//game over elements
+	SDL_Texture* tex_game_over_array[3];
+	SDL_Rect rect_game_over_array[3];	
 
 	
 	while (!yahtzee_num_close_requested)
@@ -199,22 +208,22 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 				    
 					if (fnc_check_mouse_click_event_checker(rect_Play_button))
 					{
-						yahtzee_event.type = SDL_FIRSTEVENT;
 						//enter a new session
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
 						parameter_thread_data->array_dice[5][0] = 3;
+						parameter_thread_data->array_player_score_official[0][1] = 1;
 						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 					}
 					if (fnc_check_mouse_click_event_checker(rect_Rule_button))
 					{
-						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU_RULES;
 						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 						printf_s("Rules has been activated!\n");
 					}
+					yahtzee_event.type = SDL_FIRSTEVENT;
 				}				
 			}
 			break;
@@ -225,26 +234,26 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			SDL_RenderCopy(yahtzee_main_window_renderer, tex_Rule_button, NULL, &rect_Rule_button);
 
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
-			{
-				
+			{		
 				if (yahtzee_event.button.button == SDL_BUTTON_LEFT)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_Play_button))
 					{
-						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
+						parameter_thread_data->array_dice[5][0] = 3;
+						parameter_thread_data->array_player_score_official[0][1] = 1;
 						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 					}
 					if (fnc_check_mouse_click_event_checker(rect_Rule_button))
 					{
-						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
 						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 					}
+					yahtzee_event.type = SDL_FIRSTEVENT;
 				}
 				
 			}
@@ -315,16 +324,24 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			//render score number
 			for (int i = 0; i < 14; ++i)
 			{
-				tex_score_num[i] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_medium, textColor, _itoa(parameter_thread_data->array_player_score_temp[i], c_user_score, 10));
+				
+				//check if the score has been selected
+				if (parameter_thread_data->array_player_score_official[i][1] == 1)
+				{
+					tex_score_num[i] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_medium, textColor, _itoa(parameter_thread_data->array_player_score_official[i][0], c_user_score, 10));
+				}
+				else
+				{
+					tex_score_num[i] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_medium, textColor_Fuchsia, _itoa(parameter_thread_data->array_player_score_temp[i], c_user_score, 10));
+				}
+				
 				SDL_QueryTexture(tex_score_num[i], NULL, NULL, &rect_score_num.w, &rect_score_num.h);
 				rect_score_num.y += 50;
+				rect_score_num_array[i] = rect_score_num;
 				SDL_RenderCopy(yahtzee_main_window_renderer, tex_score_num[i], NULL, &rect_score_num);
 			}
 
 			//render roll again number
-
-
-			
 			SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 			if (parameter_thread_data->array_dice[5][0] > 0)
 			{
@@ -344,9 +361,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 			SDL_RenderCopy(yahtzee_main_window_renderer, tex_roll_again, NULL, &rect_roll_again);
 
-
-			
-			
+			//check mouse event
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{			
 				//check dice
@@ -354,7 +369,6 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_dice_array[i]))
 					{
-						yahtzee_event.type = SDL_FIRSTEVENT;
 						//close flag
 						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						if (parameter_thread_data->array_dice[i][1] == true)
@@ -365,25 +379,100 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 					}
 				}
+				
 				//check roll again button
 				SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 				if (parameter_thread_data->array_dice[5][0] > 0)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_roll_again))
 					{
-						yahtzee_event.type = SDL_FIRSTEVENT;
 						parameter_thread_data->yahtzee_is_consumer_go = false;
 						parameter_thread_data->yahtzee_is_producer_go = true;
 						parameter_thread_data->array_dice[5][0]--;
 						SDL_CondBroadcast(parameter_thread_data->thd_canProduce);
 					}	
+				}	
+				SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+
+			
+				//check score
+				SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+				for (int i = 1; i < 14; ++i)
+				{
+					if (parameter_thread_data->array_player_score_official[i][1] == 0)
+					{
+						if (fnc_check_mouse_click_event_checker(rect_score_num_array[i]))
+						{
+							//get player select number
+							num_player_selected = i;
+							
+							//reset mouse click time
+							parameter_thread_data->array_dice[5][0] = 3;
+
+							//selected score add
+							parameter_thread_data->num_game_score_selected++;
+
+							//apply score into official score
+							fnc_confirm_player_score(parameter_thread_data->array_player_score_temp, parameter_thread_data->array_player_score_official, num_player_selected);
+
+							//reset dice array
+							fnc_init_2d_array(parameter_thread_data->array_dice, 5);
+
+							//calc sum score
+							fnc_calc_sum_score(parameter_thread_data->array_player_score_official);
+
+							//back to rolling
+							parameter_thread_data->yahtzee_is_consumer_go = false;
+							parameter_thread_data->yahtzee_is_producer_go = true;
+							SDL_CondBroadcast(parameter_thread_data->thd_canProduce);							
+						}
+					}
 				}
 				SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
-			
+				
+				yahtzee_event.type = SDL_FIRSTEVENT;
 			}
 			break;
 
+			case YAHTZEE_GAVE_OVER:
+				SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+				tex_game_over_array[0] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor, game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FINAL_SCORE]);
+				tex_game_over_array[1] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor, _itoa(parameter_thread_data->array_player_score_official[0][0], c_user_score,10));
+				tex_game_over_array[2] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor, game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_PLAY]);
+				SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+
+				//rect_game_over_array[0].x = 100;
+				//rect_game_over_array[0].y = 50;
 			
+				for (int i = 0; i < 3; ++i)
+				{
+					rect_game_over_array[i].x = 100;
+					SDL_QueryTexture(tex_game_over_array[i], NULL, NULL, &rect_game_over_array[i].w, &rect_game_over_array[i].h);
+					rect_game_over_array[i].y =50 + 100 * i;
+					SDL_RenderCopy(yahtzee_main_window_renderer, tex_game_over_array[i], NULL, &rect_game_over_array[i]);
+				}
+			
+				if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
+				{
+					if (yahtzee_event.button.button == SDL_BUTTON_LEFT)
+					{
+						if (fnc_check_mouse_click_event_checker(rect_game_over_array[2]))
+						{
+							SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+							parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
+							parameter_thread_data->yahtzee_is_consumer_go = false;
+							parameter_thread_data->yahtzee_is_producer_go = true;
+							parameter_thread_data->num_game_score_selected = 0;
+							SDL_CondBroadcast(parameter_thread_data->thd_canProduce);
+							SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+						}
+					}
+					yahtzee_event.type = SDL_FIRSTEVENT;
+				}
+
+			
+			
+				break;
 							
 		default:;
 		}
@@ -408,12 +497,20 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 				SDL_DestroyTexture(tex_score_name[i - 5]);
 			}
 
-			//render score number
+			//destroy score number
 			for (int i = 0; i < 14; ++i)
 			{
 				SDL_DestroyTexture(tex_score_num[i]);
 			}
 			SDL_DestroyTexture(tex_roll_again);		
+		}
+		
+		if (yahtzee_phase == YAHTZEE_GAVE_OVER)
+		{
+			for (int i = 0; i < 3; ++i)
+			{
+				SDL_DestroyTexture(tex_game_over_array[i]);
+			}
 		}
 
 		
@@ -448,6 +545,7 @@ void fnc_sdl_init_text_array()
 	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FULL_HOUSE], "Full house:");
 	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_YAHTZEE], "Yahtzee:");
 	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE], "Roll again!");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FINAL_SCORE], "Your Final Score: ");
 }
 
 
