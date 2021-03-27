@@ -64,24 +64,17 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	SDL_Event yahtzee_event;
 	fnc_sdl_init_text_array();
 
-	//lock
-	SDL_mutex* bufferLock = NULL;
-	bufferLock = SDL_CreateMutex();
+	
 
 
 	//mouse
 	int mouse_state_x = 0, mouse_state_y = 0;
 
-	//signal
-	SDL_cond* canProduce = NULL;
-	SDL_cond* canConsume = NULL;
-	canProduce = SDL_CreateCond();
-	canConsume = SDL_CreateCond();
 	
-	SDL_mutexP(bufferLock);
+	SDL_mutexP(parameter_thread_data->thd_bufferLock);
 	//close flag
 	boolean yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
-	SDL_mutexV(bufferLock);
+	SDL_mutexV(parameter_thread_data->thd_bufferLock);
 
 	const Uint32 yahtzee_sdl_render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
 	const char* location_pic = "res/pic/mainmenu.jpg";
@@ -95,10 +88,10 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 
 	TTF_Font* font = TTF_OpenFont("res/data/calibri.ttf", 25);
-	TTF_Font* font_medium = TTF_OpenFont("res/data/calibri.ttf", 60);
+	TTF_Font* font_medium = TTF_OpenFont("res/data/calibri.ttf", 50);
 	TTF_Font* font_big = TTF_OpenFont("res/data/calibri.ttf", 80);
-	SDL_Color textColor = { 255, 255, 255 };
-
+	SDL_Color textColor = { 0, 0, 255 };
+	SDL_Color textColor_Fuchsia = { 255, 0, 255 };
 
 	
 
@@ -108,6 +101,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	SDL_Texture* tex_Play_button;
 	SDL_Texture* tex_Rule_button;
 
+	
 	SDL_Rect rect_main_menu_title;
 	SDL_Rect rect_roll_Rules;
 	SDL_Rect rect_Play_button;
@@ -137,6 +131,25 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	rect_Rule_button.y = 600;
 
 
+	//in game elements
+	char c_user_score[10];
+	
+	SDL_Texture* tex_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM];
+	SDL_Texture* tex_score_name[14];
+	SDL_Texture* tex_score_num[14];
+	SDL_Texture* tex_roll_again;
+	
+	
+	SDL_Rect rect_dice;
+	SDL_Rect rect_dice_big;
+	SDL_Rect rect_dice_array[5];
+	
+	SDL_Rect rect_score_name;
+	SDL_Rect rect_score_num;
+
+	SDL_Rect rect_roll_again;
+
+	
 	while (!yahtzee_num_close_requested)
 	{
 		// clear the window
@@ -147,10 +160,10 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 		
 
 		
-		SDL_mutexP(bufferLock);
+		SDL_mutexP(parameter_thread_data->thd_bufferLock);
 		yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
 		YAHTZEE_PhaseType yahtzee_phase = parameter_thread_data->yahtzee_phase;
-		SDL_mutexV(bufferLock);
+		SDL_mutexV(parameter_thread_data->thd_bufferLock);
 
 		
 		while (SDL_PollEvent(&yahtzee_event))
@@ -158,16 +171,16 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			if (yahtzee_event.type == SDL_QUIT)
 			{
 				//close flag
-				SDL_mutexP(bufferLock);				
+				SDL_mutexP(parameter_thread_data->thd_bufferLock);
 				parameter_thread_data->yahtzee_num_close_requested = true;
-				SDL_mutexV(bufferLock);
+				SDL_mutexV(parameter_thread_data->thd_bufferLock);
 			}
 			
 		}
-		SDL_mutexP(bufferLock);
+		SDL_mutexP(parameter_thread_data->thd_bufferLock);
 		//close flag
 		
-		SDL_mutexV(bufferLock);
+		SDL_mutexV(parameter_thread_data->thd_bufferLock);
 		
 		switch (yahtzee_phase)
 		{
@@ -178,21 +191,21 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 
 
-			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
+			if (yahtzee_event.type == SDL_MOUSEBUTTONDOWN)
 			{
 				if (fnc_check_mouse_click_event_checker(rect_Play_button))
 				{
 					//close flag
-					SDL_mutexP(bufferLock);
+					SDL_mutexP(parameter_thread_data->thd_bufferLock);
 					parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
-					SDL_mutexV(bufferLock);
+					SDL_mutexV(parameter_thread_data->thd_bufferLock);
 				}
 				if (fnc_check_mouse_click_event_checker(rect_Rule_button))
 				{
 					//close flag
-					SDL_mutexP(bufferLock);
+					SDL_mutexP(parameter_thread_data->thd_bufferLock);
 					parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU_RULES;
-					SDL_mutexV(bufferLock);
+					SDL_mutexV(parameter_thread_data->thd_bufferLock);
 				}
 			}
 			break;
@@ -207,57 +220,121 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 				if (fnc_check_mouse_click_event_checker(rect_Play_button))
 				{
 					//close flag
-					SDL_mutexP(bufferLock);
+					SDL_mutexP(parameter_thread_data->thd_bufferLock);
 					parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
-					SDL_mutexV(bufferLock);
+					SDL_mutexV(parameter_thread_data->thd_bufferLock);
 				}
 				if (fnc_check_mouse_click_event_checker(rect_Rule_button))
 				{
 					//close flag
-					SDL_mutexP(bufferLock);
+					SDL_mutexP(parameter_thread_data->thd_bufferLock);
 					parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
-					SDL_mutexV(bufferLock);
+					SDL_mutexV(parameter_thread_data->thd_bufferLock);
 				}
 			}
 			break;
 
 		case YAHTZEE_IN_GAME:
 
-			SDL_mutexP(bufferLock);
-			while (!parameter_thread_data->yahtzee_is_consumer_go)
+			SDL_CondWait(parameter_thread_data->thd_canConsume, parameter_thread_data->thd_bufferLock);
+
+			rect_dice.x = 900;
+			rect_dice.y = 50;
+			rect_dice.w = 50;
+			rect_dice.h = 50;
+
+			rect_dice_big.x = 890;
+			rect_dice_big.y = 40;
+			rect_dice_big.w = 70;
+			rect_dice_big.h = 70;
+
+
+			SDL_mutexP(parameter_thread_data->thd_bufferLock);
+			//render dice
+			for (int i = 0; i < 5; ++i)
 			{
-				SDL_CondWait(canConsume, bufferLock);
+				rect_dice.y += 100;
+				rect_dice_big.y += 90;
+				tex_dice[i] = fnc_sdl_create_pic_texture(yahtzee_main_window_renderer, sdl_pick_up_dice(parameter_thread_data->array_dice[i][0]));
+
+				rect_dice_array[i] = rect_dice;
+				
+				if (parameter_thread_data->array_dice[i][1] == true)
+				{
+					SDL_RenderCopy(yahtzee_main_window_renderer, tex_dice[i], NULL, &rect_dice_big);
+					rect_dice_array[i] = rect_dice_big;
+				}
+				else SDL_RenderCopy(yahtzee_main_window_renderer, tex_dice[i], NULL, &rect_dice);
 			}
-			SDL_mutexV(bufferLock);
+			
+			
+			parameter_thread_data->yahtzee_is_producer_go = false;
+			SDL_mutexV(parameter_thread_data->thd_bufferLock);
 
 
+			rect_score_name.x = 50;
+			rect_score_name.y = 10;
 
+			
+			//render score name
+			for (int i = 5; i < 19; ++i)
+			{
+				tex_score_name[i - 5] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_medium, textColor, game_yahtzee_array_text[i]);
+				SDL_QueryTexture(tex_score_name[i - 5], NULL, NULL, &rect_score_name.w, &rect_score_name.h);
+				rect_score_name.y += 50;
+				SDL_RenderCopy(yahtzee_main_window_renderer, tex_score_name[i - 5], NULL, &rect_score_name);
+			}
+
+
+			rect_score_num.x = 500;
+			rect_score_num.y = 10;
+
+			
+			//render score number
+			for (int i = 0; i < 14; ++i)
+			{
+				tex_score_num[i] = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_medium, textColor, _itoa(parameter_thread_data->array_player_score_temp[i], c_user_score, 10));
+				SDL_QueryTexture(tex_score_num[i], NULL, NULL, &rect_score_num.w, &rect_score_num.h);
+				rect_score_num.y += 50;
+				SDL_RenderCopy(yahtzee_main_window_renderer, tex_score_num[i], NULL, &rect_score_num);
+			}
+
+			//render roll again number
+			tex_roll_again = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor_Fuchsia, game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE]);
+			SDL_QueryTexture(tex_roll_again, NULL, NULL, &rect_roll_again.w, &rect_roll_again.h);
+			
+			rect_roll_again.x = 650;
+			rect_roll_again.y = 650;
+
+			SDL_RenderCopy(yahtzee_main_window_renderer, tex_roll_again, NULL, &rect_roll_again);
 
 
 			
-
-			parameter_thread_data->array_dice[0][0];
-
-
-
-
 			
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{
-				if (fnc_check_mouse_click_event_checker(rect_Play_button))
+				//check dice
+				for (int i = 0; i < 5; ++i)
 				{
-					//close flag
-					SDL_mutexP(bufferLock);
-					parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
-					SDL_mutexV(bufferLock);
+					if (fnc_check_mouse_click_event_checker(rect_dice_array[i]))
+					{
+						//close flag
+						SDL_mutexP(parameter_thread_data->thd_bufferLock);
+						if (parameter_thread_data->array_dice[i][1] == true)
+						{
+							parameter_thread_data->array_dice[i][1] = false;
+						}
+						else parameter_thread_data->array_dice[i][1] = true;
+						SDL_mutexV(parameter_thread_data->thd_bufferLock);
+					}
 				}
-				if (fnc_check_mouse_click_event_checker(rect_Rule_button))
+				//check roll again button
+				if (fnc_check_mouse_click_event_checker(rect_roll_again))
 				{
-					//close flag
-					SDL_mutexP(bufferLock);
-					parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
-					SDL_mutexV(bufferLock);
+					SDL_CondBroadcast(parameter_thread_data->thd_canProduce);
 				}
+				
+				
 			}
 			break;
 
@@ -271,6 +348,34 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 		SDL_RenderPresent(yahtzee_main_window_renderer);
 		//Sleep(500);
 
+		
+		if (yahtzee_phase == YAHTZEE_IN_GAME)
+		{
+			//destroy dice tex
+			for (int i = 0; i < 5; ++i)
+			{
+				SDL_DestroyTexture(tex_dice[i]);
+			}
+
+			//destroy score name
+			for (int i = 5; i < 19; ++i)
+			{
+				SDL_DestroyTexture(tex_score_name[i - 5]);
+			}
+
+			//render score number
+			for (int i = 0; i < 14; ++i)
+			{
+				SDL_DestroyTexture(tex_score_num[i]);
+			}
+			SDL_DestroyTexture(tex_roll_again);		
+		}
+
+		
+		
+		
+		
+
 		// wait 1/60th of a second
 		SDL_Delay(1000 / 60);
 	}
@@ -283,7 +388,21 @@ void fnc_sdl_init_text_array()
 	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_PLAY], "Play Now!");
 	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_RULES], "Rules");
 	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_MAIN_MENU_RULES_PRINTED], "The objective of the game is to score points by rolling five dice to make certain combinations. The dice can be rolled up to three times in a turn to try to make various scoring combinations and dice must remain in the box. A game consists of thirteen rounds. After each round the player chooses which scoring category is to be used for that round. Once a category has been used in the game, it cannot be used again. The scoring categories have varying point values, some of which are fixed values and others for which the score depends on the value of the dice. A Yahtzee is five-of-a-kind and scores 50 points, the highest of any category. The winner is the player who scores the most points");
-	
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_TOTAL_SCORE], "Total Score:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_ONES], "Ones:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_TWOS], "Twos:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_THREES], "Threes:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FOURS], "Fours:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FIVES], "Fives:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_SIXES], "Sixes:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_THREE_OF_A_KIND], "Three of a kind:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FOUR_OF_A_KIND], "Four of a kind:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_SMALL_STRAIGHT], "Small straight:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_LARGE_STRAIGHT], "Large straight:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_CHANCE], "Chance:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_FULL_HOUSE], "Full house:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_SCORE_YAHTZEE], "Yahtzee:");
+	strcpy(game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE], "Roll again!");
 }
 
 

@@ -75,6 +75,7 @@ extern "C" {
 #include "include/SDL_timer.h"
 #include "include/SDL_image.h"
 #include "include/SDL_ttf.h"
+#include "include/SDL_thread.h"
 
 //include sdl_func
 #include "function_yathzee_sdl.h"
