@@ -134,10 +134,12 @@ extern "C" {
 		SDL_mutex* thd_bufferLock;
 
 		//4 score array
-		int array_dice[GAME_YAHTZEE_VALUE_MAX_DICE_NUM][2];
+		int array_dice[6][2];  // the 6th use for store the dice times
 		int array_dice_index[GAME_YAHTZEE_VALUE_MAX_DICE_FACE];
 		int array_player_score_temp[14];
 		int array_player_score_official[14][2];
+
+
 
 		//game object struct
 		YAHTZEE_PhaseType yahtzee_phase;

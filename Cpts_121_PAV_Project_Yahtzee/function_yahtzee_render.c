@@ -71,10 +71,10 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 	int mouse_state_x = 0, mouse_state_y = 0;
 
 	
-	SDL_mutexP(parameter_thread_data->thd_bufferLock);
+	SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 	//close flag
 	boolean yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
-	SDL_mutexV(parameter_thread_data->thd_bufferLock);
+	SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 
 	const Uint32 yahtzee_sdl_render_flags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC;
 	const char* location_pic = "res/pic/mainmenu.jpg";
@@ -160,10 +160,10 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 		
 
 		
-		SDL_mutexP(parameter_thread_data->thd_bufferLock);
+		SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 		yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
 		YAHTZEE_PhaseType yahtzee_phase = parameter_thread_data->yahtzee_phase;
-		SDL_mutexV(parameter_thread_data->thd_bufferLock);
+		SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 
 		
 		while (SDL_PollEvent(&yahtzee_event))
@@ -171,16 +171,16 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			if (yahtzee_event.type == SDL_QUIT)
 			{
 				//close flag
-				SDL_mutexP(parameter_thread_data->thd_bufferLock);
+				SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 				parameter_thread_data->yahtzee_num_close_requested = true;
-				SDL_mutexV(parameter_thread_data->thd_bufferLock);
+				SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 			}
 			
 		}
-		SDL_mutexP(parameter_thread_data->thd_bufferLock);
+		SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 		//close flag
 		
-		SDL_mutexV(parameter_thread_data->thd_bufferLock);
+		SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 		
 		switch (yahtzee_phase)
 		{
@@ -191,22 +191,29 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 
 
-			if (yahtzee_event.type == SDL_MOUSEBUTTONDOWN)
+			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{
-				if (fnc_check_mouse_click_event_checker(rect_Play_button))
+				yahtzee_event.type = SDL_FIRSTEVENT;
+				if (yahtzee_event.button.button == SDL_BUTTON_LEFT)
 				{
-					//close flag
-					SDL_mutexP(parameter_thread_data->thd_bufferLock);
-					parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
-					SDL_mutexV(parameter_thread_data->thd_bufferLock);
-				}
-				if (fnc_check_mouse_click_event_checker(rect_Rule_button))
-				{
-					//close flag
-					SDL_mutexP(parameter_thread_data->thd_bufferLock);
-					parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU_RULES;
-					SDL_mutexV(parameter_thread_data->thd_bufferLock);
-				}
+				    
+					if (fnc_check_mouse_click_event_checker(rect_Play_button))
+					{
+						//enter a new session
+						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+						parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
+						parameter_thread_data->array_dice[5][0] = 3;
+						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+					}
+					if (fnc_check_mouse_click_event_checker(rect_Rule_button))
+					{
+						//close flag
+						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+						parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU_RULES;
+						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+						printf_s("Rules has been activated!\n");
+					}
+				}				
 			}
 			break;
 		case YAHTZEE_GAME_MAIN_MENU_RULES:
@@ -217,27 +224,38 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{
-				if (fnc_check_mouse_click_event_checker(rect_Play_button))
+				yahtzee_event.type = SDL_FIRSTEVENT;
+				if (yahtzee_event.button.button == SDL_BUTTON_LEFT)
 				{
-					//close flag
-					SDL_mutexP(parameter_thread_data->thd_bufferLock);
-					parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
-					SDL_mutexV(parameter_thread_data->thd_bufferLock);
+					if (fnc_check_mouse_click_event_checker(rect_Play_button))
+					{
+						//close flag
+						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+						parameter_thread_data->yahtzee_phase = YAHTZEE_IN_GAME;
+						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+					}
+					if (fnc_check_mouse_click_event_checker(rect_Rule_button))
+					{
+						//close flag
+						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+						parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
+						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+					}
 				}
-				if (fnc_check_mouse_click_event_checker(rect_Rule_button))
-				{
-					//close flag
-					SDL_mutexP(parameter_thread_data->thd_bufferLock);
-					parameter_thread_data->yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
-					SDL_mutexV(parameter_thread_data->thd_bufferLock);
-				}
+				
 			}
 			break;
 
 		case YAHTZEE_IN_GAME:
 
-			SDL_CondWait(parameter_thread_data->thd_canConsume, parameter_thread_data->thd_bufferLock);
+			SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+			while (!parameter_thread_data->yahtzee_is_consumer_go)
+			{
+				SDL_CondWait(parameter_thread_data->thd_canConsume, parameter_thread_data->thd_bufferLock);
 
+			}		
+			SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+			
 			rect_dice.x = 900;
 			rect_dice.y = 50;
 			rect_dice.w = 50;
@@ -249,7 +267,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			rect_dice_big.h = 70;
 
 
-			SDL_mutexP(parameter_thread_data->thd_bufferLock);
+			SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 			//render dice
 			for (int i = 0; i < 5; ++i)
 			{
@@ -269,7 +287,7 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			
 			
 			parameter_thread_data->yahtzee_is_producer_go = false;
-			SDL_mutexV(parameter_thread_data->thd_bufferLock);
+			SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 
 
 			rect_score_name.x = 50;
@@ -300,7 +318,21 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			}
 
 			//render roll again number
-			tex_roll_again = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor_Fuchsia, game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE]);
+
+
+			
+			SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+			if (parameter_thread_data->array_dice[5][0] > 0)
+			{
+				tex_roll_again = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor_Fuchsia, game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE]);
+			}
+			else
+			{
+				tex_roll_again = fnc_sdl_create_text_texture(yahtzee_main_window_renderer, font_big, textColor, game_yahtzee_array_text[YAHTZEE_GAME_OBJECT_NAME_BUTTON_ROLL_DICE]);
+			}
+			SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+
+			
 			SDL_QueryTexture(tex_roll_again, NULL, NULL, &rect_roll_again.w, &rect_roll_again.h);
 			
 			rect_roll_again.x = 650;
@@ -313,28 +345,36 @@ int fnc_sdl_render_main(void* yahtzee_shared_data)
 			
 			if (yahtzee_event.type == SDL_MOUSEBUTTONUP)
 			{
+				yahtzee_event.type = SDL_FIRSTEVENT;
 				//check dice
 				for (int i = 0; i < 5; ++i)
 				{
 					if (fnc_check_mouse_click_event_checker(rect_dice_array[i]))
 					{
 						//close flag
-						SDL_mutexP(parameter_thread_data->thd_bufferLock);
+						SDL_LockMutex(parameter_thread_data->thd_bufferLock);
 						if (parameter_thread_data->array_dice[i][1] == true)
 						{
 							parameter_thread_data->array_dice[i][1] = false;
 						}
 						else parameter_thread_data->array_dice[i][1] = true;
-						SDL_mutexV(parameter_thread_data->thd_bufferLock);
+						SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
 					}
 				}
 				//check roll again button
-				if (fnc_check_mouse_click_event_checker(rect_roll_again))
+				SDL_LockMutex(parameter_thread_data->thd_bufferLock);
+				if (parameter_thread_data->array_dice[5][0] > 0)
 				{
-					SDL_CondBroadcast(parameter_thread_data->thd_canProduce);
+					if (fnc_check_mouse_click_event_checker(rect_roll_again))
+					{
+						parameter_thread_data->yahtzee_is_consumer_go = false;
+						parameter_thread_data->yahtzee_is_producer_go = true;
+						parameter_thread_data->array_dice[5][0]--;
+						SDL_CondBroadcast(parameter_thread_data->thd_canProduce);
+					}	
 				}
-				
-				
+				SDL_UnlockMutex(parameter_thread_data->thd_bufferLock);
+			
 			}
 			break;
 

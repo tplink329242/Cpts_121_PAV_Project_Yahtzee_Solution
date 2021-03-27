@@ -14,10 +14,10 @@ int fnc_sdl_event_main(void* yahtzee_shared_data)
 
 
 	
-	SDL_mutexP(bufferLock);
+	SDL_LockMutex(bufferLock);
 	//close flag
 	boolean yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
-	SDL_mutexV(bufferLock);
+	SDL_UnlockMutex(bufferLock);
 
 	
 	
@@ -26,9 +26,9 @@ int fnc_sdl_event_main(void* yahtzee_shared_data)
 	
 	while (!yahtzee_num_close_requested)
 	{
-		SDL_mutexP(bufferLock);
+		SDL_LockMutex(bufferLock);
 		yahtzee_num_close_requested = parameter_thread_data->yahtzee_num_close_requested;
-		SDL_mutexV(bufferLock);
+		SDL_UnlockMutex(bufferLock);
 
 
 		
@@ -40,9 +40,9 @@ int fnc_sdl_event_main(void* yahtzee_shared_data)
 		{
 			if (yahtzee_event.type == SDL_QUIT)
 			{
-				SDL_mutexP(bufferLock);
+				SDL_LockMutex(bufferLock);
 				yahtzee_num_close_requested = true;
-				SDL_mutexV(bufferLock);
+				SDL_UnlockMutex(bufferLock);
 			}
 		}
 		

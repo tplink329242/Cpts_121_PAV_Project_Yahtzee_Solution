@@ -41,33 +41,46 @@ int main(int argc, char* argv[])
 
 
 	
-	SDL_mutexP(yahtzee_parameter.thd_bufferLock);
+	SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
 	boolean is_closed = yahtzee_parameter.yahtzee_num_close_requested;
 	boolean is_producer_go = yahtzee_parameter.yahtzee_is_producer_go;
 	
 	yahtzee_phase = YAHTZEE_GAME_MAIN_MENU;
 	yahtzee_parameter.yahtzee_phase = yahtzee_phase;
 	yahtzee_parameter.yahtzee_is_consumer_go = false;
-	SDL_mutexV(yahtzee_parameter.thd_bufferLock);
+	SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
 
 	
 	while (!is_closed)
 	{
-		SDL_mutexP(yahtzee_parameter.thd_bufferLock);
+		SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
 		is_closed = yahtzee_parameter.yahtzee_num_close_requested;
 		yahtzee_phase = yahtzee_parameter.yahtzee_phase;
-		SDL_mutexV(yahtzee_parameter.thd_bufferLock);
+		SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
 
 		if (yahtzee_phase == YAHTZEE_IN_GAME)
 		{
-			SDL_mutexP(yahtzee_parameter.thd_bufferLock);
+			SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
 			fnc_exec_game_one_round(yahtzee_parameter.array_dice, yahtzee_parameter.array_dice_index, yahtzee_parameter.array_player_score_temp);
 			yahtzee_parameter.yahtzee_is_consumer_go = true;
 			yahtzee_parameter.yahtzee_is_producer_go = false;
-			SDL_mutexV(yahtzee_parameter.thd_bufferLock);
+
 			SDL_CondBroadcast(yahtzee_parameter.thd_canConsume);
 
-			SDL_CondWait(yahtzee_parameter.thd_canProduce, yahtzee_parameter.thd_bufferLock);
+			printf_s("The roll time has %d times.\n", yahtzee_parameter.array_dice[5][0]);
+
+			SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
+
+			SDL_Delay(500);
+
+			
+			SDL_LockMutex(yahtzee_parameter.thd_bufferLock);
+			while (!yahtzee_parameter.yahtzee_is_producer_go)
+			{				
+				SDL_CondWait(yahtzee_parameter.thd_canProduce, yahtzee_parameter.thd_bufferLock);
+			}			
+			SDL_UnlockMutex(yahtzee_parameter.thd_bufferLock);
+			
 			
 		}
 
